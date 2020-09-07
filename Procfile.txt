@@ -1,1 +1,0 @@
-web: gunicorn voice-timer2 : app
