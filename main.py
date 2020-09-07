@@ -1,27 +1,27 @@
-# インストールした discord.py を読み込む
 import discord
+import datetime
 
-# 自分のBotのアクセストークンに置き換えてください
-TOKEN = 'THi5IsDuMMyaCCesSTOK3n00.Cl2FMQ.ThIsi5DUMMyAcc3s5ToKen0000'
-
-# 接続に必要なオブジェクトを生成
 client = discord.Client()
+pretime_dict = {}
 
-# 起動時に動作する処理
 @client.event
-async def on_ready():
-    # 起動したらターミナルにログイン通知が表示される
-    print('ログインしました')
+async def on_voice_state_update(before, after):
+  print("ボイスチャンネルで変化がありました")
 
-# メッセージ受信時に動作する処理
-@client.event
-async def on_message(message):
-    # メッセージ送信者がBotだった場合は無視する
-    if message.author.bot:
-        return
-    # 「/neko」と発言したら「にゃーん」が返る処理
-    if message.content == '/neko':
-        await message.channel.send('にゃーん')
+  if((before.voice.self_mute is not after.voice.self_mute) or (before.voice.self_deaf is not after.voice.self_deaf)):
+    print("ボイスチャンネルでミュート設定の変更がありました")
+    return
 
-# Botの起動とDiscordサーバーへの接続
-client.run(TOKEN)
+  if(before.voice_channel is None):
+    pretime_dict[after.name] = datetime.datetime.now()
+  elif(after.voice_channel is None):
+    duration_time = pretime_dict[before.name] - datetime.datetime.now()
+    duration_time_adjust = int(duration_time.total_seconds()) * -1
+
+    reply_channel_name = "general"
+    reply_channel = [channel for channel in before.server.channels if channel.name == reply_channel_name][0]
+    reply_text = after.name + "　が　"+ before.voice_channel.name + "　から抜けました。　通話時間：" + str(duration_time_adjust) +"秒"
+
+    await client.send_message(reply_channel ,reply_text)
+
+client.run("token")#ボットのトークン
