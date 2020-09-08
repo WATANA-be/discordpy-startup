@@ -2,10 +2,6 @@ import discord
 import datetime
 
 
-token = os.environ['DISCORD_BOT_TOKEN']
-
-
-
 
 
 client = discord.Client()
